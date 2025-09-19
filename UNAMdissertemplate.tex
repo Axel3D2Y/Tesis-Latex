@@ -172,19 +172,16 @@ Finalmente, extiendo mi gratitud a todas las personas que, de alguna manera, han
 
 
 
-
-
-
 \chapter{Introducción}
-En este trabajo se examina en profundidad el funcionamiento de las máquinas de soporte vectorial (SVM), un algoritmo de aprendizaje automático concebido por Vladimir Vapnik y su equipo en los laboratorios de AT\&T durante la década de 1960 y presentado en su libro \textit{The nature of statistical learning theory}, en 1999.  Aunque originalmente diseñado para abordar problemas de clasificación binaria, el modelo ha evolucionado gracias a investigaciones que han extendido su alcance a la clasificación multiclase y aplicaciones en problemas de regresión.
+En este trabajo se examina en profundidad el funcionamiento de las máquinas de soporte vectorial (SVM, por sus siglas en ingles), un algoritmo de aprendizaje automático concebido por Vladimir Vapnik y su equipo en los laboratorios de AT\&T durante la década de 1960 y presentado en su libro \textit{The nature of statistical learning theory}, en 1999.  Aunque originalmente fue diseñado para abordar problemas de clasificación binaria, el modelo ha evolucionado gracias a investigaciones que han extendido su alcance a la clasificación multiclase y en aplicaciones en problemas de regresión.
 
 El capítulo 1 está enfocado principalmente en describir intuitivamente todos los conceptos necesarios para entender la construcción del modelo SVM. En este apartado se describen de manera clara y concisa los elementos clave, como la separación óptima de clases, el margen de decisión y los vectores de soporte. Asimismo, se abordan otros temas que pueden obviarse en un principio, pero que son necesarios para comprender por completo el modelo.
 
-La Sección 2 desarrolla el marco matemático formal del modelo SVM, comenzando con la formulación del problema de margen duro. Posteriormente, se aborda su generalización al problema de margen blando, que permite manejar datos no separables linealmente. Además, se introduce el concepto de transformación mediante funciones kernel, lo que posibilita la extensión del modelo a espacios de características de mayor dimensionalidad.
+La Sección 2 desarrolla el marco matemático formal del modelo SVM, comenzando con la formulación del problema de margen rígido. Posteriormente, se aborda su generalización al problema de margen flexible, que permite manejar datos no separables linealmente. Además, se introduce el concepto de transformación mediante funciones kernel, lo que posibilita la extensión del modelo a espacios de características en dimesiones mayores.
 
-El capítulo 3 reinterpreta el problema SVM desde la perspectiva de la regularización, destacando cómo esta formulación alternativa se relaciona con el problema de margen blando. Además, se muestra la equivalencia entre ambas metodologías.
+El capítulo 3 reinterpreta el problema SVM desde la perspectiva de la regularización, destacando cómo esta formulación alternativa se relaciona con el problema de margen rígido. Además, se muestra la equivalencia entre ambas metodologías.
 
-El capítulo 4 se enfoca en un análisis detallado del procedimiento conocido como envenenamiento. Esta es una técnica adversarial en la que se inyectan datos estratégicamente diseñados para comprometer la precisión del modelo. Este capítulo explora los fundamentos teóricos de este tipo de ataque.
+El capítulo 4 se enfoca en un análisis detallado del procedimiento conocido como envenenamiento. Esta es una técnica adversarial en la que se adicionan datos estratégicamente diseñados para comprometer la precisión del modelo. Este capítulo explora los fundamentos teóricos de este tipo de ataque.
 
 Finalmente, los dos últimos capítulos están dedicados a aplicaciones prácticas. En ellos se implementa el modelo SVM utilizando herramientas de software para analizar el conjunto de datos MNIST. Posteriormente, se incluyen las conclusiones derivadas del análisis, sintetizando los hallazgos clave del trabajo y sugiriendo estrategias para la defensa de los modelos ante el envenenamiento.
 
@@ -197,11 +194,11 @@ Finalmente, los dos últimos capítulos están dedicados a aplicaciones práctic
     
 \mainmatter
 
-\chapter{Conceptos Basicos} 
+\chapter{Conceptos Básicos} 
 	\section{Introducción: Motivación}
-	{El \textit{aprendizaje estadístico} siempre ha jugado un rol importante en diferentes áreas de la ciencia, la finanza y la industria, y más recientemente en nuevas áreas como lo son la minería de datos, el \textit{machine learning} y la inteligencia artificial. Pero para poder obtener conclusiones del aprendizaje estadístico, es necesario que deduzcamos una función capaz de predecir un valor deseado a partir de algunos datos, ejemplos o entradas, a menudo llamados \textbf{\textit{inputs}}, aunque también algunos autores les llaman predictores o variables independientes. Estos \textit{inputs} pueden provenir esencialmente de medidas cuantitativas (salario, precio de un producto, índice de grasa, etc.), categóricas (Posee la enfermedad/No posee la enfermedad) o una combinación de ambas. En cualquier caso, nuestro interés se centra en que, a partir de los \textit{inputs},podamos construir un modelo de predicción que nos permitirá decidir el resultado de nuevos objetos que no se encuentran en el conjunto de datos. A este problema se le llama \textit{aprendizaje supervisado}, debido a que se caracteriza por usar conjuntos de datos etiquetados para entrenar los algoritmos que clasifican nuevos datos (en el aprendizaje no supervisado, los algoritmos se entrenan con datos sin etiquetar y usualmente se utilizan para descubrir patrones y relaciones entre datos).
+	{El \textit{aprendizaje estadístico} siempre ha jugado un rol importante en diferentes áreas de la ciencia, la finanza y la industria, y más recientemente en nuevas áreas como lo son la minería de datos, el \textit{machine learning} y la inteligencia artificial. Pero para poder obtener conclusiones del aprendizaje estadístico, es necesario necesario deducir una función capaz de predecir un valor deseado a partir de algunos datos, ejemplos o entradas; a menudo llamados \textbf{\textit{inputs}}, aunque también algunos autores les llaman predictores o variables independientes. Estos \textit{inputs} pueden provenir esencialmente de medidas cuantitativas (salario, precio de un producto, índice de grasa, etc.), categóricas (Posee la enfermedad/No posee la enfermedad) o una combinación de ambas. En cualquier caso, nuestro interés se centra en que, a partir de los \textit{inputs},podamos construir un modelo de predicción que nos permitirá decidir el resultado de nuevos objetos que no se encuentran en el conjunto de datos. A este problema se le llama \textit{aprendizaje supervisado}, debido a que se caracteriza por usar conjuntos de datos etiquetados para entrenar los algoritmos que clasifican nuevos datos (en el aprendizaje no supervisado, los algoritmos se entrenan con datos sin etiquetar y usualmente se utilizan para descubrir patrones y relaciones entre datos).
 
-A los valores predichos a partir de nuestro modelo de predicción se les llama valores de salida, variables de respuesta, variables dependientes o, más comúnmente en la literatura, \textit{\textbf{outputs}}, y al igual que en los \textit{inputs}, los \textit{outputs} pueden tomar valores tanto cualitativos como cuantitativos.
+A los valores predichos a partir de nuestro modelo se les llama valores de salida, variables de respuesta, variables dependientes o, más comúnmente en la literatura, \textit{\textbf{outputs}}, y al igual que en los \textit{inputs}, los \textit{outputs} pueden tomar valores tanto cualitativos como cuantitativos.
 
 Al conjunto de mediciones de \textit{inputs} y \textit{outputs} se le llama \textbf{\textit{datos de entrenamiento}}, y nos servirán para construir el modelo predictivo. En la variable predictora (\textit{outputs}) es importante distinguir las variables cualitativas (también denominadas variables categóricas, discretas o de factores) de las cuantitativas. Esta distinción en los \textit{outputs} ha llevado a una nomenclatura para la tarea de predicción:
 
@@ -210,19 +207,19 @@ Al conjunto de mediciones de \textit{inputs} y \textit{outputs} se le llama \tex
     \item Clasificación, cuando los \textit{outputs} son variables cualitativas.
 \end{itemize}
 
-Como notación, usaremos $x$ como una variable de entrada. Notemos que esta variable puede ser un vector, donde las coordenadas correspondientes del vector se representan mediante subíndices, mientras que el i-ésimo valor observado de $x$ se escribe como $x_i$. Las variables de salida  se notarán por $y$,en el caso de las variables cualitativas algunos autores usan la letra $g$ (grupo), en el presente documento usaremos la letra $y$.
+Como notación, usaremos $x$ como una variable de entrada. Notemos que esta variable puede ser un vector, donde las coordenadas correspondientes del vector se representan mediante subíndices, mientras que el i-ésimo valor observado de $x$ se escribe como $x_i$. Las variables de salida  se notarán por $y$, en el caso de las variables cualitativas algunos autores usan la letra $g$ (grupo), en el presente documento usaremos la letra $y$ para indicar las variables de salida.
 
 Para un grupo de dos clases, el conjunto de \textit{outputs} tomará valores $\{0, 1\}$ o $\{-1, 1\}$, según sea el caso (en las máquinas de soporte vectorial, usualmente utilizamos el conjunto $\{-1, 1\}$). Dado que todos los vectores se asumen como vectores columna, la fila i-ésima de $x$ es $x_i^T$, la transpuesta del vector $x_i$.
 
-La tarea de aprendizaje se expresa de la siguiente manera: dada una entrada representada por el vector $x$, debemos realizar una buena predicción de la salida $y$, que denotamos como $\hat{y}$ (pronunciado “y-tilde”), mediante alguna función. Si $y$ toma valores en $\mathbb{R}$, entonces $\hat{y}$ también debería hacerlo; lo mismo ocurre para salidas categóricas $g$, donde $\hat{G}$ debería tomar valores en el mismo conjunto $G$. Note que es posible transformar el grupo $G$ en un conjunto de números mediante una biyección en subconjuntos de $\mathbb{N}$, en la que a cada elemento de $G$ se le asocia un único elemento de este subconjunto.
+La tarea de aprendizaje se expresa de la siguiente manera: dada una entrada representada por el vector $x$, debemos realizar una buena predicción de la salida $y$, que denotamos como $\hat{y}$, mediante alguna función. Si $y$ toma valores en $\mathbb{R}$, entonces $\hat{y}$ también debería hacerlo; lo mismo ocurre para salidas categóricas $g$, donde $\hat{G}$ debería tomar valores en el mismo conjunto $G$. Note que es posible transformar el grupo $G$ en un conjunto de números mediante una biyección en subconjuntos de $\mathbb{N}$, en la que a cada elemento de $G$ se le asocia un único elemento de este subconjunto.
 }
 
 
 
 
 	
-    \section{Máquinas de soporte vectorial (Idea intuitiva)} {
-En el presente trabajo desarrollaremos el modelo de \textbf{\textit{máquinas de soporte vectorial}} (\textbf{\textit{SVM}}, por sus siglas en inglés), el cual pertenece a la categoría de modelos de clasificación. La idea esencial de este modelo consiste en lo siguiente: dado un conjunto de \textit{inputs}, donde cada uno pertenece a una de dos categorías, se construye un modelo capaz de predecir si un nuevo \textit{input} pertenece a una categoría o a la otra. Usualmente, estos \textit{inputs} se representan como puntos en diagramas de dispersión para facilitar su visualización.
+    \section{Idea intuitiva de las Máquinas de Soporte Vectorial} {
+En el presente trabajo desarrollaremos el modelo de \textbf{\textit{máquinas de soporte vectorial}}, el cual pertenece a la categoría de modelos de clasificación. La idea esencial de este modelo consiste en lo siguiente: dado un conjunto de \textit{inputs}, donde cada uno pertenece a una de dos categorías, se construye un modelo capaz de predecir si un nuevo \textit{input} pertenece a una categoría o a la otra. Usualmente, estos \textit{inputs} se representan como puntos en diagramas de dispersión para facilitar su visualización.
 
 \begin{figure}[h]
     \centering
@@ -241,28 +238,26 @@ En el presente trabajo desarrollaremos el modelo de \textbf{\textit{máquinas de
 
     \caption{En ambas imágenes se presenta un hiperplano, pero en la primera es posible construir un hiperplano que separe correctamente todas las entradas, mientras que en la segunda no hay forma de construirlo, debido a la distribución de los datos.}
     \label{fig:imagenes}
-\end{figure} El \textit{SVM} busca un hiperplano que separe de forma óptima los puntos de una clase de los de la otra. Es importante aclarar que no en todos los conjuntos de datos es posible encontrar un hiperplano que logre una separación perfecta; sin embargo, podemos construir un modelo óptimo que minimice la cantidad de datos mal clasificados (ver Figura 1.1). En los casos en los que sí es posible encontrar un hiperplano que separe correctamente todos los datos, los denominamos casos separables. Por el contrario, si no es posible encontrar un hiperplano que separe correctamente todos los datos, los denominaremos casos no separables.
+\end{figure} 
+
+El nodelo \textit{SVM} busca un hiperplano que separe de forma óptima los puntos de una clase de los de la otra. Es importante aclarar que no en todos los conjuntos de datos es posible encontrar un hiperplano que logre una separación perfecta; sin embargo, podemos construir un modelo óptimo que minimice la cantidad de datos mal clasificados (ver Figura 1.1). En los casos en los que sí es posible encontrar un hiperplano que separe correctamente todos los datos, los denominamos casos linealmente separables. Por el contrario, si no es posible encontrar un hiperplano que separe correctamente todos los datos, los denominaremos casos linealmente no separables.
  \begin{figure}[h]
     \centering
             \includegraphics[width=10cm, height=9cm]{4.png}
     \caption{Pueden existir multiples hiperplanos como los representados por las lineas punteadas, pero nuestro problema radica en encontrar el que maximiza la distancia del hiperplano a los puntos más cercanos de cada clase.}
     \label{fig:imagenes}
 \end{figure}
- Cabe señalar que dicho hiperplano puede no ser único por lo que buscamos el hiperplano que maximice la distancia con los puntos más cercanos a él (ver figura1 1.2), por este motivo las \textit{SVM} también son conocidas como clasificadores de margen máximo. A estos puntos que se encuentran más cerca del hiperplano, pero que a su vez máximiza la distancia se les suele llamar \textit{vectores de soporte} (hablaremos de ellos con más detalle en la Sección 2).
+ Cabe señalar que dicho hiperplano puede no ser único por lo que buscamos el hiperplano que maximice la distancia con los puntos más cercanos a él (ver figura1 1.2), por este motivo el método de SVM también es conocidos como clasificador de margen máximo. A los puntos que se encuentran más cerca del hiperplano, pero que a su vez máximiza la distancia se les suele llamar \textit{vectores de soporte}, hablaremos de ellos con más detalle en la Sección 2.
 
 
- 
- 
- 
- 
- 
 
-	\section{Envenamiento (Idea intuitiva)} {El aprendizaje estadístico puede ser usado como una herramienta en la toma de decisiones en una gran variedad de problemas, incluyendo aquellos relacionados con la seguridad, pues un ejemplo de su aplicación puede ser la identificación de comportamientos irregulares. En este ámbito, se ha utilizado para la detección de spam, intrusiones o fraudes. Sin embargo, recientemente han surgido problemas relacionados con el envenenamiento de datos. Este es un tipo de ataque en el que se manipula o contamina el conjunto de datos utilizado en el entrenamiento de los modelos de aprendizaje automático, con el fin de comprometer la precisión y eficacia de los algoritmos y los procesos de toma de decisiones.
+	\section{Idea preliminar de envenenamiento}
+ {El aprendizaje estadístico puede ser usado como una herramienta en la toma de decisiones en una gran variedad de problemas, incluyendo aquellos relacionados con la seguridad, por ejemplo considere el problema identificación de comportamientos irregulares. En este ámbito, se ha utilizado para la detección de spam, intrusiones o fraudes.Recientemente han surgido problemas relacionados con el envenenamiento de datos. Este es un tipo de ataque en el que se manipula o contamina el conjunto de datos utilizado en el entrenamiento de los modelos de aprendizaje automático, con el fin de comprometer la precisión y eficacia de los algoritmos y los procesos de toma de decisiones.
 
 Por ejemplo, algunas empresas pueden modificar sus estrategias para evitar ser detectadas por los filtros de spam, lo que genera la necesidad de desarrollar métodos de aprendizaje que sean robustos ante este tipo de datos envenenados.  
-Los ataques contra los algoritmos de aprendizaje automático pueden clasificarse en varios tipos, pero nos centraremos principalmente en los ataques de envenenamiento, los cuales pertenecen a una categoría denominada ataques causales, en los que se inyectan puntos de datos especialmente diseñados para corromper el proceso de aprendizaje. Este tipo de ataque es particularmente relevante desde el punto de vista práctico, ya que, aunque generalmente no se tiene acceso directo a la base de datos de entrenamiento, es posible introducir nuevos datos en el conjunto de entrenamiento (por ejemplo, cuando los datos son recopilados a través de Internet), lo que brinda una oportunidad para envenenar los datos.  
+Los ataques contra los algoritmos de aprendizaje automático pueden clasificarse en varios tipos, pero nos centraremos principalmente en los ataques de envenenamiento, denominados ataques causales, en los que se inyectan puntos de datos especialmente diseñados para corromper el proceso de aprendizaje. Este tipo de ataque es particularmente relevante desde el punto de vista práctico, ya que, aunque generalmente no se tiene acceso directo a la base de datos de entrenamiento, es posible introducir nuevos datos en el conjunto de entrenamiento (por ejemplo, cuando los datos son recopilados a través de Internet), lo que brinda una oportunidad para envenenar los datos.  
 
-En particular, nos centraremos en una familia específica de ataques de envenenamiento contra las (\textit{SVM}). Estos ataques consisten en inyectar datos en el conjunto de entrenamiento que han sido diseñados específicamente para aumentar el error de prueba del modelo en la función de pérdida.  
+De manera particular nos centraremos en una familia específica de ataques de envenenamiento contra las (\textit{SVM}). Estos ataques consisten en inyectar puntos de datos en el conjunto de entrenamiento que han sido diseñados específicamente para aumentar el error del modelo en la función de pérdida.  
 En el peor de los casos, se asume que el atacante conoce el algoritmo de aprendizaje y puede extraer datos de la misma distribución o incluso conocer los datos de entrenamiento utilizados por el modelo (a esto se le conoce como modelo de caja blanca o \textit{white-box}).  
 Si asumimos que tenemos una solución óptima al problema de entrenamiento de una \textit{SVM}, es posible construir un modelo de ataque insertando puntos diseñados específicamente para afectar una medida de rendimiento del modelo (generalmente la penalización por error). Esto puede formularse como un problema de optimización, donde el objetivo es maximizar el impacto en la medida de rendimiento, manteniendo al mismo tiempo la solución óptima del problema de entrenamiento.  
 
@@ -276,7 +271,7 @@ Antes de desarrollar el modelo, haremos un breve resumen de algunos resultados �
    
    
    
-   \section{Conceptos basicos de Geometría}
+   \section{Conceptos básicos de Geometría}
    {
 El modelo lineal es el método más usual para describir la relación entre una variable dependiente y una o más variables independientes. Dado un vector de entradas 
 $$x^ T = (x_1, x_2, \ldots, x_p)$$
@@ -794,7 +789,7 @@ para todo \( i \), \( \xi_i \geq 0 \) y \( \sum_{i=1}^{N} \xi_i \leq \text{const
         
 Donde \( C \) representa el \textit{costo} y este limita la suma de los \( \xi_i \). Es decir, la suma de los \( \xi_i \) determina el número de violaciones al margen que podemos tolerar. Puesto que si \( \xi_i \) es mayor que 1, entonces la observación \( x_i \) está en el lado incorrecto del hiperplano, para cada \( i \). Por lo tanto, \( \sum_{i=1}^{n} \xi_i \) es menor o igual a \( C \). Así, al considerar un costo mayor, aumenta la cantidad de tolerancia para variables mal clasificadas, y por lo tanto tendremos que considerar un margen mayor. Mientras que si tomamos un valor de \( C \) pequeño, creamos un modelo que es menos tolerante a las violaciones del margen y, por lo tanto, el margen es más estrecho. En la práctica, este valor es elegido por el usuario y puede estimarse mediante validación cruzada.
 
-Así, el nuevo problema de optimización consistirá en encontrar el hiperplano de separación definido por \( \beta \) y \( \beta_0 \), que minimice \eqref{eq: caso no separable función a minimizar}. Al hiperplano resultante se le denomina hiperplano de separación de margen blando (Soft margin). La manera de obtener el hiperplano de separación es análoga al caso separable, por lo que los pasos siguientes son similares a los de la sección anterior.
+Así, el nuevo problema de optimización consistirá en encontrar el hiperplano de separación definido por \( \beta \) y \( \beta_0 \), que minimice \eqref{eq: caso no separable función a minimizar}. Al hiperplano resultante se le denomina hiperplano de separación de margen flexible (Soft margin). La manera de obtener el hiperplano de separación es análoga al caso separable, por lo que los pasos siguientes son similares a los de la sección anterior.
 
         
         La función de Lagrange primal es:
